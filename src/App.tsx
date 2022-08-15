@@ -1,29 +1,36 @@
 import { CreateToDoItem } from "./components/TodoItem";
 import { useEffect, useState } from "react";
 import { ToDoItem } from "./types";
+import axios from "axios";
+
+
 
 function App(): JSX.Element {
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
+  //const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [todoList, setTodoList] = useState<ToDoItem[]>();
-  const loadDataFromEndPoint = async (endpoint: `/${string}`) => {
+  const [toDoInput, setToDoInput]=useState<string>("")
+  const [lastSubmitted, setLastSubmitted]=useState<string>("")
+
+  async function loadDataFromEndPoint(endpoint: `/${string}`) {
     try {
-      const res = await fetch(`http://localhost:4000${endpoint}`);
-      const body = await res.json();
+      const response = await axios.get(`http://localhost:4000${endpoint}`);
+      const body = await response.data;
+      console.log(response);
       setTodoList(body);
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error(error);
     }
-  };
+  }
   useEffect(() => {
-    if (isFirstLoad) {
+    //if (isFirstLoad) {
       loadDataFromEndPoint("/list");
-      setIsFirstLoad(false);
-    }
-  }, [isFirstLoad]);
+      //setIsFirstLoad(false);
+    //}
+    }, [lastSubmitted]);
   return (
     <>
       <h1>To Do List</h1>
-      {todoList && <CreateToDoItem list={todoList} />}
+      {todoList && <CreateToDoItem  list={todoList} setToDoInput={setToDoInput} toDoInput={toDoInput} setLastSubmitted={setLastSubmitted} lastSubmitted={lastSubmitted} setToDoList={setTodoList}/>}
     </>
   );
 }
